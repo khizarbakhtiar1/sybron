@@ -204,4 +204,3 @@ Contributions welcome! Please read our contributing guidelines first.
 
 ---
 
-Built for healthcare data sovereignty

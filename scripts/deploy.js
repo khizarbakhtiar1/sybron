@@ -67,7 +67,23 @@ async function main() {
   const dataMarketplaceAddress = await dataMarketplace.getAddress();
   console.log("   DataMarketplace deployed to:", dataMarketplaceAddress);
 
-  // 6. Set up roles and permissions
+  // 6. Deploy Account Rules (on-chain permissioning)
+  console.log("6️⃣  Deploying AccountRules...");
+  const AccountRules = await hre.ethers.getContractFactory("AccountRules");
+  const accountRules = await AccountRules.deploy([deployer.address]);
+  await accountRules.waitForDeployment();
+  const accountRulesAddress = await accountRules.getAddress();
+  console.log("   AccountRules deployed to:", accountRulesAddress);
+
+  // 7. Deploy Node Rules (on-chain permissioning)
+  console.log("7️⃣  Deploying NodeRules...");
+  const NodeRules = await hre.ethers.getContractFactory("NodeRules");
+  const nodeRules = await NodeRules.deploy(deployer.address);
+  await nodeRules.waitForDeployment();
+  const nodeRulesAddress = await nodeRules.getAddress();
+  console.log("   NodeRules deployed to:", nodeRulesAddress);
+
+  // 8. Set up roles and permissions
   console.log("\n⚙️  Setting up roles and permissions...");
   
   // Grant REGISTRAR_ROLE to DataMarketplace in PatientRegistry
@@ -95,6 +111,8 @@ async function main() {
   console.log(`   ResearcherRegistry: ${researcherRegistryAddress}`);
   console.log(`   ConsentManager:    ${consentManagerAddress}`);
   console.log(`   DataMarketplace:   ${dataMarketplaceAddress}`);
+  console.log(`   AccountRules:      ${accountRulesAddress}`);
+  console.log(`   NodeRules:         ${nodeRulesAddress}`);
   console.log("─".repeat(60));
   console.log("\n📝 Treasury Addresses:");
   console.log(`   Patient Rewards:   ${patientRewardsPool}`);
@@ -114,7 +132,9 @@ async function main() {
       PatientRegistry: patientRegistryAddress,
       ResearcherRegistry: researcherRegistryAddress,
       ConsentManager: consentManagerAddress,
-      DataMarketplace: dataMarketplaceAddress
+      DataMarketplace: dataMarketplaceAddress,
+      AccountRules: accountRulesAddress,
+      NodeRules: nodeRulesAddress
     },
     treasury: {
       patientRewardsPool,

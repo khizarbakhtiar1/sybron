@@ -12,6 +12,10 @@ module.exports = {
       },
     },
   },
+  gasReporter: {
+    enabled: process.env.REPORT_GAS === "true",
+    currency: "USD",
+  },
   networks: {
     hardhat: {
       chainId: 1337,

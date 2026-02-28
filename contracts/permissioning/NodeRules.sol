@@ -37,6 +37,9 @@ contract NodeRules is AccessControl {
     // Track validators separately for quick access
     bytes32[] private validatorNodeIds;
     
+    // Track active validator count separately for deactivation guard
+    uint256 private activeValidatorCount;
+
     // Events
     event NodeAdded(bytes32 indexed nodeId, NodeType nodeType, string organization);
     event NodeRemoved(bytes32 indexed nodeId);
@@ -95,6 +98,7 @@ contract NodeRules is AccessControl {
         
         if (nodeType == NodeType.Validator) {
             validatorNodeIds.push(nodeId);
+            activeValidatorCount++;
         }
         
         emit NodeAdded(nodeId, nodeType, organizationName);
@@ -109,8 +113,9 @@ contract NodeRules is AccessControl {
         
         // Don't allow removing last validator
         if (nodes[nodeId].nodeType == NodeType.Validator) {
-            require(validatorNodeIds.length > 1, "Cannot remove last validator");
+            require(activeValidatorCount > 1, "Cannot remove last validator");
             _removeFromValidators(nodeId);
+            activeValidatorCount--;
         }
         
         nodes[nodeId].isActive = false;
@@ -125,7 +130,8 @@ contract NodeRules is AccessControl {
         require(nodes[nodeId].isActive, "Node not active");
         
         if (nodes[nodeId].nodeType == NodeType.Validator) {
-            require(validatorNodeIds.length > 1, "Cannot deactivate last validator");
+            require(activeValidatorCount > 1, "Cannot deactivate last validator");
+            activeValidatorCount--;
         }
         
         nodes[nodeId].isActive = false;
@@ -141,6 +147,9 @@ contract NodeRules is AccessControl {
         require(!nodes[nodeId].isActive, "Node already active");
         
         nodes[nodeId].isActive = true;
+        if (nodes[nodeId].nodeType == NodeType.Validator) {
+            activeValidatorCount++;
+        }
         emit NodeReactivated(nodeId);
     }
     

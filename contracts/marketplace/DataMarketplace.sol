@@ -119,6 +119,8 @@ contract DataMarketplace is AccessControl, Pausable, ReentrancyGuard {
         uint256 platformFee
     );
 
+    event PlatformFeeUpdated(uint256 oldFeeBps, uint256 newFeeBps);
+
     constructor(
         address admin,
         address _healthToken,
@@ -127,6 +129,13 @@ contract DataMarketplace is AccessControl, Pausable, ReentrancyGuard {
         address _consentManager,
         address _platformFeeRecipient
     ) {
+        require(admin != address(0), "Invalid admin address");
+        require(_healthToken != address(0), "Invalid token address");
+        require(_patientRegistry != address(0), "Invalid patient registry");
+        require(_researcherRegistry != address(0), "Invalid researcher registry");
+        require(_consentManager != address(0), "Invalid consent manager");
+        require(_platformFeeRecipient != address(0), "Invalid fee recipient");
+
         _grantRole(DEFAULT_ADMIN_ROLE, admin);
         _grantRole(OPERATOR_ROLE, admin);
 
@@ -330,7 +339,9 @@ contract DataMarketplace is AccessControl, Pausable, ReentrancyGuard {
      */
     function updatePlatformFee(uint256 newFeeBps) external onlyRole(DEFAULT_ADMIN_ROLE) {
         require(newFeeBps <= MAX_FEE_BPS, "Fee too high");
+        uint256 oldFeeBps = platformFeeBps;
         platformFeeBps = newFeeBps;
+        emit PlatformFeeUpdated(oldFeeBps, newFeeBps);
     }
 
     /**

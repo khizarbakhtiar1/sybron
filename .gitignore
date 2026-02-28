@@ -26,6 +26,9 @@ logs/
 coverage/
 coverage.json
 
+# Deployments (auto-generated, network-specific)
+deployments/
+
 # Besu data
 docker/data/
 docker/keys/

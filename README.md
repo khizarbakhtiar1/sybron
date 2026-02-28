@@ -1,8 +1,8 @@
-# 🏥 Sybron Health Chain
+# Sybron Health Chain
 
 A permissioned healthcare data marketplace built on **Hyperledger Besu**. Patients own and monetize their health data while maintaining full consent control. Research institutions access anonymized datasets through a transparent, auditable marketplace.
 
-## 🌟 Key Features
+## Key Features
 
 - **Patient Data Ownership**: Patients register pseudonymously and control all access to their data
 - **Granular Consent Management**: Time-limited, purpose-specific consent with revocation rights
@@ -11,7 +11,7 @@ A permissioned healthcare data marketplace built on **Hyperledger Besu**. Patien
 - **Privacy-First Design**: Encrypted off-chain data storage with on-chain access control
 - **Permissioned Network**: Only verified validators (hospitals, research institutions, regulators)
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -34,7 +34,7 @@ A permissioned healthcare data marketplace built on **Hyperledger Besu**. Patien
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## 📦 Smart Contracts
+## Smart Contracts
 
 | Contract | Description |
 |----------|-------------|
@@ -44,7 +44,7 @@ A permissioned healthcare data marketplace built on **Hyperledger Besu**. Patien
 | `ConsentManager.sol` | Granular consent management with templates |
 | `DataMarketplace.sol` | Core marketplace for data listings and access |
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -100,7 +100,7 @@ npx hardhat run scripts/demo.js --network besu_local
 npm run node:stop
 ```
 
-## 📋 Workflow
+## Workflow
 
 ### 1. Patient Registration
 ```javascript
@@ -178,30 +178,30 @@ await dataMarketplace.completeAccess(requestId);
 // → Platform receives 5 HEALTH (5%)
 ```
 
-## 🔐 Security Considerations
+## Security Considerations
 
 - **Private Keys**: Never commit private keys. Use `.env` for local development only
 - **Off-Chain Data**: All actual health data stored encrypted on IPFS/Filecoin
 - **Access Control**: Role-based access using OpenZeppelin's AccessControl
 - **Consent Validation**: Every data access validates active consent on-chain
 
-## 🗺️ Roadmap
+## Roadmap
 
-- [ ] Phase 1: Core contracts (✅ Complete)
+- [x] Phase 1: Core contracts (Complete)
 - [ ] Phase 2: Privacy groups (Tessera integration)
 - [ ] Phase 3: Multi-party consent (for family/guardian scenarios)
 - [ ] Phase 4: AI training consent module
 - [ ] Phase 5: Cross-chain bridges for token liquidity
 - [ ] Phase 6: Governance DAO for protocol upgrades
 
-## 📄 License
+## License
 
 MIT License - see [LICENSE](LICENSE) for details.
 
-## 🤝 Contributing
+## Contributing
 
 Contributions welcome! Please read our contributing guidelines first.
 
 ---
 
-Built with ❤️ for healthcare data sovereignty
+Built for healthcare data sovereignty

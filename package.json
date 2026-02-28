@@ -1,0 +1,36 @@
+{
+  "name": "sybron-health-chain",
+  "version": "1.0.0",
+  "description": "A permissioned healthcare data marketplace built on Hyperledger Besu",
+  "main": "index.js",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:local": "hardhat run scripts/deploy.js --network besu_local",
+    "deploy:testnet": "hardhat run scripts/deploy.js --network besu_testnet",
+    "node:start": "docker-compose -f docker/docker-compose.yml up -d",
+    "node:stop": "docker-compose -f docker/docker-compose.yml down",
+    "node:logs": "docker-compose -f docker/docker-compose.yml logs -f",
+    "console": "hardhat console --network besu_local",
+    "clean": "hardhat clean",
+    "coverage": "hardhat coverage"
+  },
+  "keywords": [
+    "hyperledger",
+    "besu",
+    "healthcare",
+    "blockchain",
+    "data-marketplace"
+  ],
+  "author": "Sybron Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@openzeppelin/contracts": "^5.0.1",
+    "dotenv": "^16.3.1",
+    "hardhat": "^2.19.4"
+  },
+  "dependencies": {
+    "ethers": "^6.9.2"
+  }
+}

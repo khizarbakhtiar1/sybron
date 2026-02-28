@@ -1,0 +1,156 @@
+version: "3.8"
+
+# ============================================================================
+# SYBRON HEALTH CHAIN - Hyperledger Besu Permissioned Network
+# ============================================================================
+# This configuration sets up a QBFT consensus network with:
+# - 4 Validator nodes (hospitals, research institutions, regulators)
+# - On-chain permissioning for accounts and nodes
+# - Zero gas price (free transactions for consortium members)
+# ============================================================================
+
+x-besu-common: &besu-common
+  image: hyperledger/besu:24.1.0
+  restart: unless-stopped
+  environment:
+    - BESU_OPTS=-Xmx2g
+  networks:
+    - sybron-network
+
+services:
+  # ==========================================================================
+  # VALIDATOR NODE 1 - Sybron Foundation (Bootnode)
+  # ==========================================================================
+  validator-1:
+    <<: *besu-common
+    container_name: sybron-validator-1
+    volumes:
+      - ./data/validator-1:/opt/besu/data
+      - ./keys/validator-1:/opt/besu/keys:ro
+      - ../network/genesis.json:/opt/besu/genesis.json:ro
+      - ../network/permissions_config.toml:/opt/besu/permissions_config.toml:ro
+    ports:
+      - "8545:8545"   # HTTP JSON-RPC
+      - "8546:8546"   # WebSocket
+      - "30303:30303" # P2P
+    command: >
+      --genesis-file=/opt/besu/genesis.json
+      --data-path=/opt/besu/data
+      --node-private-key-file=/opt/besu/keys/nodekey
+      --host-allowlist="*"
+      --rpc-http-enabled
+      --rpc-http-host=0.0.0.0
+      --rpc-http-port=8545
+      --rpc-http-cors-origins="*"
+      --rpc-http-api=ETH,NET,QBFT,WEB3,ADMIN,PERM,TXPOOL
+      --rpc-ws-enabled
+      --rpc-ws-host=0.0.0.0
+      --rpc-ws-port=8546
+      --min-gas-price=0
+      --permissions-accounts-contract-enabled=false
+      --permissions-nodes-contract-enabled=false
+      --permissions-accounts-config-file-enabled=true
+      --permissions-nodes-config-file-enabled=true
+      --permissions-config-file=/opt/besu/permissions_config.toml
+
+  # ==========================================================================
+  # VALIDATOR NODE 2 - Hospital A
+  # ==========================================================================
+  validator-2:
+    <<: *besu-common
+    container_name: sybron-validator-2
+    volumes:
+      - ./data/validator-2:/opt/besu/data
+      - ./keys/validator-2:/opt/besu/keys:ro
+      - ../network/genesis.json:/opt/besu/genesis.json:ro
+      - ../network/permissions_config.toml:/opt/besu/permissions_config.toml:ro
+    ports:
+      - "8555:8545"
+      - "8556:8546"
+      - "30304:30303"
+    command: >
+      --genesis-file=/opt/besu/genesis.json
+      --data-path=/opt/besu/data
+      --node-private-key-file=/opt/besu/keys/nodekey
+      --host-allowlist="*"
+      --rpc-http-enabled
+      --rpc-http-host=0.0.0.0
+      --rpc-http-port=8545
+      --rpc-http-cors-origins="*"
+      --rpc-http-api=ETH,NET,QBFT,WEB3
+      --min-gas-price=0
+      --bootnodes=enode://${VALIDATOR_1_PUBKEY}@validator-1:30303
+      --permissions-accounts-config-file-enabled=true
+      --permissions-nodes-config-file-enabled=true
+      --permissions-config-file=/opt/besu/permissions_config.toml
+    depends_on:
+      - validator-1
+
+  # ==========================================================================
+  # VALIDATOR NODE 3 - Research Institution B
+  # ==========================================================================
+  validator-3:
+    <<: *besu-common
+    container_name: sybron-validator-3
+    volumes:
+      - ./data/validator-3:/opt/besu/data
+      - ./keys/validator-3:/opt/besu/keys:ro
+      - ../network/genesis.json:/opt/besu/genesis.json:ro
+      - ../network/permissions_config.toml:/opt/besu/permissions_config.toml:ro
+    ports:
+      - "8565:8545"
+      - "8566:8546"
+      - "30305:30303"
+    command: >
+      --genesis-file=/opt/besu/genesis.json
+      --data-path=/opt/besu/data
+      --node-private-key-file=/opt/besu/keys/nodekey
+      --host-allowlist="*"
+      --rpc-http-enabled
+      --rpc-http-host=0.0.0.0
+      --rpc-http-port=8545
+      --rpc-http-api=ETH,NET,QBFT,WEB3
+      --min-gas-price=0
+      --bootnodes=enode://${VALIDATOR_1_PUBKEY}@validator-1:30303
+      --permissions-accounts-config-file-enabled=true
+      --permissions-nodes-config-file-enabled=true
+      --permissions-config-file=/opt/besu/permissions_config.toml
+    depends_on:
+      - validator-1
+
+  # ==========================================================================
+  # VALIDATOR NODE 4 - Regulator C
+  # ==========================================================================
+  validator-4:
+    <<: *besu-common
+    container_name: sybron-validator-4
+    volumes:
+      - ./data/validator-4:/opt/besu/data
+      - ./keys/validator-4:/opt/besu/keys:ro
+      - ../network/genesis.json:/opt/besu/genesis.json:ro
+      - ../network/permissions_config.toml:/opt/besu/permissions_config.toml:ro
+    ports:
+      - "8575:8545"
+      - "8576:8546"
+      - "30306:30303"
+    command: >
+      --genesis-file=/opt/besu/genesis.json
+      --data-path=/opt/besu/data
+      --node-private-key-file=/opt/besu/keys/nodekey
+      --host-allowlist="*"
+      --rpc-http-enabled
+      --rpc-http-host=0.0.0.0
+      --rpc-http-port=8545
+      --rpc-http-api=ETH,NET,QBFT,WEB3
+      --min-gas-price=0
+      --bootnodes=enode://${VALIDATOR_1_PUBKEY}@validator-1:30303
+      --permissions-accounts-config-file-enabled=true
+      --permissions-nodes-config-file-enabled=true
+      --permissions-config-file=/opt/besu/permissions_config.toml
+    depends_on:
+      - validator-1
+
+networks:
+  sybron-network:
+    driver: bridge
+    name: sybron-health-chain

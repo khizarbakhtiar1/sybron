@@ -1,0 +1,30 @@
+# ============================================================================
+# SYBRON HEALTH CHAIN - Permissions Configuration
+# ============================================================================
+# This file defines which accounts and nodes are allowed on the network.
+# For production, use on-chain permissioning contracts instead.
+# ============================================================================
+
+# Accounts allowed to send transactions
+# These are whitelisted addresses that can interact with the network
+accounts-allowlist = [
+    "0xfe3b557e8fb62b89f4916b721be55ceb828dbd73",  # Admin/Deployer
+    "0x627306090abaB3A6e1400e9345bC60c78a8BEf57",  # Patient Rewards Pool
+    "0xf17f52151EbEF6C7334FAD080c5704D77216b732",  # Research Grants Pool
+    "0xC5fdf4076b8F3A5357c5E395ab970B5B54098Fef",  # Operations Wallet
+    "0x821aEa9a577a9b44299B9c15c88cf3087F3b5544"   # Reserve Wallet
+]
+
+# Nodes allowed to connect to the network
+# Format: enode://<pubkey>@<host>:<port>
+# These will be populated by the init script
+nodes-allowlist = [
+    # Validator 1 - Sybron Foundation
+    # "enode://PUBKEY@validator-1:30303",
+    # Validator 2 - Hospital A  
+    # "enode://PUBKEY@validator-2:30303",
+    # Validator 3 - Research Institution B
+    # "enode://PUBKEY@validator-3:30303",
+    # Validator 4 - Regulator C
+    # "enode://PUBKEY@validator-4:30303"
+]

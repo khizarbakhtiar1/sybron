@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>sybron</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav>
+        <a href="/" class="logo">sybron</a>
+        <div class="nav-links">
+            <a href="/patient.html">for patients</a>
+            <a href="/researcher.html">for researchers</a>
+            <a href="/about.html">about</a>
+        </div>
+        <button id="connect-btn" class="btn-connect">connect wallet</button>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <h1>your health data,<br>your choice.</h1>
+            <p class="subtitle">
+                a marketplace where patients control their health data 
+                and researchers access it fairly.
+            </p>
+            <div class="hero-actions">
+                <a href="/patient.html" class="btn-primary">i'm a patient</a>
+                <a href="/researcher.html" class="btn-secondary">i'm a researcher</a>
+            </div>
+        </section>
+
+        <section class="how-it-works">
+            <h2>how it works</h2>
+            <div class="steps">
+                <div class="step">
+                    <span class="step-num">1</span>
+                    <h3>register</h3>
+                    <p>patients sign up through a verified hospital. researchers apply with credentials.</p>
+                </div>
+                <div class="step">
+                    <span class="step-num">2</span>
+                    <h3>list or browse</h3>
+                    <p>patients list anonymized data. researchers browse available datasets.</p>
+                </div>
+                <div class="step">
+                    <span class="step-num">3</span>
+                    <h3>consent</h3>
+                    <p>patients grant granular, time-limited consent. full control, always revocable.</p>
+                </div>
+                <div class="step">
+                    <span class="step-num">4</span>
+                    <h3>earn or access</h3>
+                    <p>researchers pay in HEALTH tokens. patients earn 95%, platform takes 5%.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="stats">
+            <div class="stat">
+                <span class="stat-value" id="stat-patients">--</span>
+                <span class="stat-label">patients</span>
+            </div>
+            <div class="stat">
+                <span class="stat-value" id="stat-researchers">--</span>
+                <span class="stat-label">researchers</span>
+            </div>
+            <div class="stat">
+                <span class="stat-value" id="stat-transactions">--</span>
+                <span class="stat-label">transactions</span>
+            </div>
+            <div class="stat">
+                <span class="stat-value" id="stat-earned">--</span>
+                <span class="stat-label">HEALTH earned by patients</span>
+            </div>
+        </section>
+
+        <section class="why">
+            <h2>why sybron?</h2>
+            <div class="why-grid">
+                <div class="why-item">
+                    <h3>you own your data</h3>
+                    <p>not hospitals. not insurers. you.</p>
+                </div>
+                <div class="why-item">
+                    <h3>you get paid</h3>
+                    <p>your data is valuable. finally, you benefit.</p>
+                </div>
+                <div class="why-item">
+                    <h3>transparent</h3>
+                    <p>every access is recorded on blockchain. full audit trail.</p>
+                </div>
+                <div class="why-item">
+                    <h3>revocable consent</h3>
+                    <p>change your mind anytime. your data, your rules.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>sybron health chain — built on hyperledger besu</p>
+        <p class="footer-links">
+            <a href="https://github.com/sybron">github</a> · 
+            <a href="/docs">docs</a> · 
+            <a href="mailto:hello@sybron.health">contact</a>
+        </p>
+    </footer>
+
+    <script src="js/web3.min.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

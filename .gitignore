@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+
+# Build
+artifacts/
+cache/
+typechain-types/
+
+# Environment
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Coverage
+coverage/
+coverage.json
+
+# Besu data
+docker/data/
+docker/keys/
+
+# Internal documentation (private, not for public repo)
+internal-docs/
+docker/keys/
+
+# Misc
+*.bak
+*.tmp

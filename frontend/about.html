@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>about — sybron</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav>
+        <a href="/" class="logo">sybron</a>
+        <div class="nav-links">
+            <a href="/patient.html">for patients</a>
+            <a href="/researcher.html">for researchers</a>
+            <a href="/about.html" style="color: var(--text);">about</a>
+        </div>
+        <button id="connect-btn" class="btn-connect">connect wallet</button>
+    </nav>
+
+    <main>
+        <h1>about sybron</h1>
+        
+        <section style="margin: 2rem 0;">
+            <p style="font-size: 1.1rem; line-height: 1.8; max-width: 700px;">
+                sybron is a healthcare data marketplace built on a permissioned blockchain. 
+                we believe patients should own and benefit from their health data.
+            </p>
+        </section>
+
+        <section style="margin: 3rem 0;">
+            <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">the problem</h2>
+            <p style="color: var(--text-muted); max-width: 700px; line-height: 1.8;">
+                right now, your health data is scattered across hospitals, labs, insurers, 
+                and pharmacies. you can't easily access it. you certainly don't profit from it. 
+                meanwhile, these organizations sell your data to pharma companies and researchers 
+                without your knowledge or consent.
+            </p>
+        </section>
+
+        <section style="margin: 3rem 0;">
+            <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">our solution</h2>
+            <p style="color: var(--text-muted); max-width: 700px; line-height: 1.8;">
+                sybron gives you control. you register through a hospital (for verification), 
+                but your data stays encrypted and under your control. when researchers want access, 
+                they come to you. you set the terms—how long they can access it, for what purpose, 
+                at what price. you can revoke access anytime.
+            </p>
+            <p style="color: var(--text-muted); max-width: 700px; line-height: 1.8; margin-top: 1rem;">
+                and you get paid. directly. in HEALTH tokens. 95% goes to you, 5% to the platform.
+            </p>
+        </section>
+
+        <section style="margin: 3rem 0;">
+            <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">the technology</h2>
+            <p style="color: var(--text-muted); max-width: 700px; line-height: 1.8;">
+                sybron runs on <strong>hyperledger besu</strong>, a permissioned ethereum-compatible 
+                blockchain. this means:
+            </p>
+            <ul style="color: var(--text-muted); max-width: 700px; line-height: 2; margin-top: 1rem; padding-left: 1.5rem;">
+                <li>only verified hospitals, research institutions, and regulators can run nodes</li>
+                <li>all transactions are transparent and auditable (for compliance)</li>
+                <li>no mining, no energy waste—uses QBFT consensus</li>
+                <li>smart contracts handle consent, payments, and access control automatically</li>
+            </ul>
+        </section>
+
+        <section style="margin: 3rem 0;">
+            <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">who runs sybron?</h2>
+            <p style="color: var(--text-muted); max-width: 700px; line-height: 1.8;">
+                the network is operated by a consortium of healthcare organizations. 
+                no single entity controls it. the sybron foundation provides the software 
+                and coordinates the network, but governance is shared.
+            </p>
+        </section>
+
+        <section style="margin: 3rem 0;">
+            <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">faq</h2>
+            
+            <div style="max-width: 700px;">
+                <details style="margin-bottom: 1rem; padding: 1rem; background: var(--card-bg); border: 1px solid var(--border); border-radius: 4px;">
+                    <summary style="cursor: pointer; font-weight: 500;">is my real identity visible on the blockchain?</summary>
+                    <p style="margin-top: 0.75rem; color: var(--text-muted);">
+                        no. only a pseudonymous ID (a hash) is stored on-chain. your real identity is verified 
+                        off-chain by a hospital and never touches the blockchain.
+                    </p>
+                </details>
+                
+                <details style="margin-bottom: 1rem; padding: 1rem; background: var(--card-bg); border: 1px solid var(--border); border-radius: 4px;">
+                    <summary style="cursor: pointer; font-weight: 500;">where is my actual health data stored?</summary>
+                    <p style="margin-top: 0.75rem; color: var(--text-muted);">
+                        encrypted on IPFS (a distributed file system). the blockchain only stores references 
+                        and access permissions, not the data itself.
+                    </p>
+                </details>
+                
+                <details style="margin-bottom: 1rem; padding: 1rem; background: var(--card-bg); border: 1px solid var(--border); border-radius: 4px;">
+                    <summary style="cursor: pointer; font-weight: 500;">what if I change my mind about sharing?</summary>
+                    <p style="margin-top: 0.75rem; color: var(--text-muted);">
+                        you can revoke consent at any time. the researcher will immediately lose access 
+                        to your data. (they keep any data already downloaded, but can't access new data.)
+                    </p>
+                </details>
+                
+                <details style="margin-bottom: 1rem; padding: 1rem; background: var(--card-bg); border: 1px solid var(--border); border-radius: 4px;">
+                    <summary style="cursor: pointer; font-weight: 500;">how much can I earn?</summary>
+                    <p style="margin-top: 0.75rem; color: var(--text-muted);">
+                        depends on your data. rare conditions, complete genomics, or longitudinal data 
+                        are more valuable. you set your own price, and researchers can offer more.
+                    </p>
+                </details>
+                
+                <details style="margin-bottom: 1rem; padding: 1rem; background: var(--card-bg); border: 1px solid var(--border); border-radius: 4px;">
+                    <summary style="cursor: pointer; font-weight: 500;">who can access my data?</summary>
+                    <p style="margin-top: 0.75rem; color: var(--text-muted);">
+                        only verified researchers from approved institutions. they go through background checks 
+                        and must be approved by network validators before they can request any data.
+                    </p>
+                </details>
+            </div>
+        </section>
+
+        <section style="margin: 3rem 0;">
+            <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">contact</h2>
+            <p style="color: var(--text-muted);">
+                questions? reach us at <a href="mailto:hello@sybron.health">hello@sybron.health</a>
+            </p>
+        </section>
+    </main>
+
+    <footer>
+        <p>sybron health chain — built on hyperledger besu</p>
+        <p class="footer-links">
+            <a href="https://github.com/sybron">github</a> · 
+            <a href="/docs">docs</a> · 
+            <a href="mailto:hello@sybron.health">contact</a>
+        </p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.9.0/ethers.umd.min.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

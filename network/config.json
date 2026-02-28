@@ -1,0 +1,48 @@
+{
+  "logging": "INFO",
+  "network": {
+    "name": "Sybron Health Chain",
+    "chainId": 1981,
+    "description": "Permissioned healthcare data marketplace network"
+  },
+  "consensus": {
+    "algorithm": "QBFT",
+    "blockPeriodSeconds": 2,
+    "epochLength": 30000,
+    "requestTimeoutSeconds": 4
+  },
+  "validators": {
+    "initial": [
+      {
+        "name": "Hospital-A",
+        "nodeAddress": "0x94bb30b5cf2edfe1e55e17c4ddf47b4eb26ab5a3"
+      },
+      {
+        "name": "Research-Institution-B", 
+        "nodeAddress": "0x8ad24c484fcfbe7c73e65f9f18e5caec0edae6f8"
+      },
+      {
+        "name": "Regulator-C",
+        "nodeAddress": "0xa958ccc9adc07f23a6e6a24b84d50c2b0cb6ef72"
+      },
+      {
+        "name": "Sybron-Foundation",
+        "nodeAddress": "0xd98c8c5fc6f0d20a9dbb48f4d3d1fd6e68eab6da"
+      }
+    ]
+  },
+  "permissions": {
+    "mode": "allowlist",
+    "accounts": {
+      "allowlist": true
+    },
+    "nodes": {
+      "allowlist": true
+    }
+  },
+  "privacy": {
+    "enabled": true,
+    "url": "http://tessera:9101",
+    "multiTenancyEnabled": false
+  }
+}

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>researcher portal — sybron</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav>
+        <a href="/" class="logo">sybron</a>
+        <div class="nav-links">
+            <a href="/patient.html">for patients</a>
+            <a href="/researcher.html" style="color: var(--text);">for researchers</a>
+            <a href="/about.html">about</a>
+        </div>
+        <button id="connect-btn" class="btn-connect">connect wallet</button>
+    </nav>
+
+    <main>
+        <h1 style="margin-bottom: 0.5rem;">researcher portal</h1>
+        <p class="subtitle" style="margin-bottom: 2rem; color: var(--text-muted);">
+            discover health datasets. request access. advance research.
+        </p>
+
+        <!-- not connected state -->
+        <div id="not-connected" class="alert alert-info">
+            connect your wallet to browse and request data.
+        </div>
+
+        <!-- connected state -->
+        <div id="dashboard" style="display: none;">
+            
+            <!-- overview cards -->
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem;">
+                <div class="data-card">
+                    <div class="data-card-meta">your tier</div>
+                    <div class="stat-value" id="my-tier">Bronze</div>
+                </div>
+                <div class="data-card">
+                    <div class="data-card-meta">reputation</div>
+                    <div class="stat-value" id="my-reputation">50%</div>
+                </div>
+                <div class="data-card">
+                    <div class="data-card-meta">datasets accessed</div>
+                    <div class="stat-value" id="my-accesses">0</div>
+                </div>
+                <div class="data-card">
+                    <div class="data-card-meta">total spent</div>
+                    <div class="stat-value" id="my-spent">0 HEALTH</div>
+                </div>
+            </div>
+
+            <!-- tabs -->
+            <div class="tabs">
+                <button class="tab active" data-tab="browse">browse data</button>
+                <button class="tab" data-tab="myrequests">my requests</button>
+                <button class="tab" data-tab="accessed">accessed data</button>
+            </div>
+
+            <!-- browse data -->
+            <div id="tab-browse" class="tab-content active">
+                
+                <!-- filters -->
+                <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+                    <select id="filter-category" style="padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px;">
+                        <option value="">all categories</option>
+                        <option value="genomics">genomics</option>
+                        <option value="lab_results">lab results</option>
+                        <option value="imaging">medical imaging</option>
+                        <option value="prescriptions">prescriptions</option>
+                        <option value="vitals">vitals</option>
+                        <option value="mental_health">mental health</option>
+                        <option value="chronic">chronic conditions</option>
+                        <option value="lifestyle">lifestyle</option>
+                    </select>
+                    <select id="filter-price" style="padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px;">
+                        <option value="">any price</option>
+                        <option value="0-50">0-50 HEALTH</option>
+                        <option value="50-100">50-100 HEALTH</option>
+                        <option value="100-500">100-500 HEALTH</option>
+                        <option value="500+">500+ HEALTH</option>
+                    </select>
+                    <input type="text" id="filter-search" placeholder="search descriptions..." 
+                        style="flex: 1; min-width: 200px; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px;">
+                </div>
+
+                <!-- listings -->
+                <div id="browse-list">
+                    <!-- sample listings for demo -->
+                    <div class="data-card">
+                        <div class="data-card-header">
+                            <div>
+                                <div class="data-card-title">complete genomic sequence</div>
+                                <div class="data-card-meta">
+                                    <span class="badge badge-neutral">genomics</span>
+                                    · listed 3 days ago
+                                </div>
+                            </div>
+                            <div class="data-card-price">150 HEALTH</div>
+                        </div>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">
+                            whole genome sequencing with variant annotations. includes BRCA1/2 analysis.
+                        </p>
+                        <div class="data-card-actions">
+                            <button class="btn-small btn-small-primary" onclick="requestAccess('demo-1')">
+                                request access
+                            </button>
+                            <button class="btn-small btn-small-secondary">view details</button>
+                        </div>
+                    </div>
+
+                    <div class="data-card">
+                        <div class="data-card-header">
+                            <div>
+                                <div class="data-card-title">5-year lab panel history</div>
+                                <div class="data-card-meta">
+                                    <span class="badge badge-neutral">lab results</span>
+                                    · listed 1 week ago
+                                </div>
+                            </div>
+                            <div class="data-card-price">75 HEALTH</div>
+                        </div>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">
+                            quarterly blood panels from 2021-2025. CBC, metabolic panel, lipids, thyroid.
+                        </p>
+                        <div class="data-card-actions">
+                            <button class="btn-small btn-small-primary" onclick="requestAccess('demo-2')">
+                                request access
+                            </button>
+                            <button class="btn-small btn-small-secondary">view details</button>
+                        </div>
+                    </div>
+
+                    <div class="data-card">
+                        <div class="data-card-header">
+                            <div>
+                                <div class="data-card-title">continuous glucose monitoring (6 months)</div>
+                                <div class="data-card-meta">
+                                    <span class="badge badge-neutral">vitals</span>
+                                    · listed 2 weeks ago
+                                </div>
+                            </div>
+                            <div class="data-card-price">200 HEALTH</div>
+                        </div>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">
+                            CGM data from dexcom sensor. 5-minute intervals. includes meal/activity logs.
+                        </p>
+                        <div class="data-card-actions">
+                            <button class="btn-small btn-small-primary" onclick="requestAccess('demo-3')">
+                                request access
+                            </button>
+                            <button class="btn-small btn-small-secondary">view details</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- my requests -->
+            <div id="tab-myrequests" class="tab-content">
+                <div id="requests-list">
+                    <div class="empty-state">
+                        <h3>no pending requests</h3>
+                        <p>when you request data access, they'll appear here.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- accessed data -->
+            <div id="tab-accessed" class="tab-content">
+                <div id="accessed-list">
+                    <div class="empty-state">
+                        <h3>no accessed data yet</h3>
+                        <p>data you've successfully accessed will appear here.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>sybron health chain — researcher portal</p>
+    </footer>
+
+    <!-- request access modal -->
+    <div id="request-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 100;">
+        <div style="background: white; max-width: 500px; margin: 10vh auto; padding: 2rem; border-radius: 8px;">
+            <h2 style="margin-bottom: 1rem;">request data access</h2>
+            <form id="request-form">
+                <input type="hidden" id="request-listing-id">
+                <div class="form-group">
+                    <label for="request-purpose">research purpose</label>
+                    <textarea id="request-purpose" rows="3" 
+                        placeholder="describe how you'll use this data..." required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="request-offer">your offer (HEALTH)</label>
+                    <input type="number" id="request-offer" min="1" placeholder="150" required>
+                    <small style="color: var(--text-muted); font-size: 0.8rem;">
+                        must be at least the base price. higher offers may be prioritized.
+                    </small>
+                </div>
+                <div class="form-actions" style="display: flex; gap: 1rem;">
+                    <button type="submit">submit request</button>
+                    <button type="button" onclick="closeModal()" style="background: none; border: 1px solid var(--border); color: var(--text);">
+                        cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.9.0/ethers.umd.min.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        // tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                tab.classList.add('active');
+                document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        // called when wallet connects
+        function onWalletConnected() {
+            document.getElementById('not-connected').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            loadResearcherData();
+        }
+
+        async function loadResearcherData() {
+            console.log('loading researcher data for:', userAddress);
+            // load researcher's tier, reputation, requests
+        }
+
+        // request access modal
+        function requestAccess(listingId) {
+            document.getElementById('request-listing-id').value = listingId;
+            document.getElementById('request-modal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('request-modal').style.display = 'none';
+        }
+
+        document.getElementById('request-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const listingId = document.getElementById('request-listing-id').value;
+            const purpose = document.getElementById('request-purpose').value;
+            const offer = document.getElementById('request-offer').value;
+
+            console.log('submitting request:', { listingId, purpose, offer });
+            
+            // in real app, call smart contract
+            await new Promise(r => setTimeout(r, 1000));
+            
+            showToast('access request submitted', 'success');
+            closeModal();
+            
+            // switch to requests tab
+            document.querySelector('[data-tab="myrequests"]').click();
+        });
+
+        // close modal on outside click
+        document.getElementById('request-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'request-modal') closeModal();
+        });
+    </script>
+</body>
+</html>

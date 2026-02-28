@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>patient portal — sybron</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav>
+        <a href="/" class="logo">sybron</a>
+        <div class="nav-links">
+            <a href="/patient.html" style="color: var(--text);">for patients</a>
+            <a href="/researcher.html">for researchers</a>
+            <a href="/about.html">about</a>
+        </div>
+        <button id="connect-btn" class="btn-connect">connect wallet</button>
+    </nav>
+
+    <main>
+        <h1 style="margin-bottom: 0.5rem;">patient portal</h1>
+        <p class="subtitle" style="margin-bottom: 2rem; color: var(--text-muted);">
+            manage your data, view earnings, control who has access.
+        </p>
+
+        <!-- not connected state -->
+        <div id="not-connected" class="alert alert-info">
+            connect your wallet to view your dashboard.
+        </div>
+
+        <!-- connected state -->
+        <div id="dashboard" style="display: none;">
+            
+            <!-- overview cards -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
+                <div class="data-card">
+                    <div class="data-card-meta">total earnings</div>
+                    <div class="stat-value" id="my-earnings">0 HEALTH</div>
+                </div>
+                <div class="data-card">
+                    <div class="data-card-meta">active listings</div>
+                    <div class="stat-value" id="my-listings">0</div>
+                </div>
+                <div class="data-card">
+                    <div class="data-card-meta">pending requests</div>
+                    <div class="stat-value" id="my-requests">0</div>
+                </div>
+            </div>
+
+            <!-- tabs -->
+            <div class="tabs">
+                <button class="tab active" data-tab="listings">my listings</button>
+                <button class="tab" data-tab="requests">access requests</button>
+                <button class="tab" data-tab="consents">active consents</button>
+                <button class="tab" data-tab="new">new listing</button>
+            </div>
+
+            <!-- my listings -->
+            <div id="tab-listings" class="tab-content active">
+                <div id="listings-list">
+                    <div class="empty-state">
+                        <h3>no listings yet</h3>
+                        <p>create your first data listing to start earning.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- access requests -->
+            <div id="tab-requests" class="tab-content">
+                <div id="requests-list">
+                    <div class="empty-state">
+                        <h3>no pending requests</h3>
+                        <p>when researchers request access to your data, they'll appear here.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- active consents -->
+            <div id="tab-consents" class="tab-content">
+                <div id="consents-list">
+                    <div class="empty-state">
+                        <h3>no active consents</h3>
+                        <p>consents you've granted will appear here.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- new listing form -->
+            <div id="tab-new" class="tab-content">
+                <div class="form-section">
+                    <h2>create new listing</h2>
+                    <form id="new-listing-form">
+                        <div class="form-group">
+                            <label for="listing-category">data category</label>
+                            <select id="listing-category" required>
+                                <option value="">select category...</option>
+                                <option value="genomics">genomics</option>
+                                <option value="lab_results">lab results</option>
+                                <option value="imaging">medical imaging</option>
+                                <option value="prescriptions">prescriptions</option>
+                                <option value="vitals">vitals & monitoring</option>
+                                <option value="mental_health">mental health</option>
+                                <option value="chronic">chronic conditions</option>
+                                <option value="lifestyle">lifestyle data</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="listing-description">description</label>
+                            <textarea id="listing-description" rows="3" 
+                                placeholder="describe your data (e.g., 'complete blood panel from 2025, includes cholesterol, glucose, etc.')" 
+                                required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="listing-price">base price (HEALTH tokens)</label>
+                            <input type="number" id="listing-price" min="1" step="1" 
+                                placeholder="100" required>
+                            <small style="color: var(--text-muted); font-size: 0.8rem;">
+                                researchers can offer more. you keep 95%, platform takes 5%.
+                            </small>
+                        </div>
+                        <div class="form-group">
+                            <label for="listing-file">encrypted data file (IPFS hash or upload)</label>
+                            <input type="text" id="listing-file" 
+                                placeholder="ipfs://Qm... or paste your IPFS hash">
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" id="create-listing-btn">create listing</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>sybron health chain — patient portal</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.9.0/ethers.umd.min.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        // tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                tab.classList.add('active');
+                document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        // called when wallet connects
+        function onWalletConnected() {
+            document.getElementById('not-connected').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            loadPatientData();
+        }
+
+        async function loadPatientData() {
+            // load patient's listings, requests, consents
+            // for now, show empty states
+            console.log('loading patient data for:', userAddress);
+        }
+
+        // new listing form
+        document.getElementById('new-listing-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const btn = document.getElementById('create-listing-btn');
+            const originalText = btn.textContent;
+            btn.textContent = 'creating...';
+            btn.disabled = true;
+
+            try {
+                const category = document.getElementById('listing-category').value;
+                const description = document.getElementById('listing-description').value;
+                const price = document.getElementById('listing-price').value;
+                const fileUri = document.getElementById('listing-file').value;
+
+                // in real app, this would call the smart contract
+                console.log('creating listing:', { category, description, price, fileUri });
+                
+                // simulate delay
+                await new Promise(r => setTimeout(r, 1500));
+                
+                showToast('listing created successfully', 'success');
+                
+                // switch to listings tab
+                document.querySelector('[data-tab="listings"]').click();
+                
+            } catch (error) {
+                console.error('error creating listing:', error);
+                showToast('failed to create listing', 'error');
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

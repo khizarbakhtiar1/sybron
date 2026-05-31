@@ -23,15 +23,11 @@
             manage your data, view earnings, control who has access.
         </p>
 
-        <!-- not connected state -->
         <div id="not-connected" class="alert alert-info">
             connect your wallet to view your dashboard.
         </div>
 
-        <!-- connected state -->
         <div id="dashboard" style="display: none;">
-            
-            <!-- overview cards -->
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
                 <div class="data-card">
                     <div class="data-card-meta">total earnings</div>
@@ -47,45 +43,20 @@
                 </div>
             </div>
 
-            <!-- tabs -->
             <div class="tabs">
                 <button class="tab active" data-tab="listings">my listings</button>
                 <button class="tab" data-tab="requests">access requests</button>
-                <button class="tab" data-tab="consents">active consents</button>
                 <button class="tab" data-tab="new">new listing</button>
             </div>
 
-            <!-- my listings -->
             <div id="tab-listings" class="tab-content active">
-                <div id="listings-list">
-                    <div class="empty-state">
-                        <h3>no listings yet</h3>
-                        <p>create your first data listing to start earning.</p>
-                    </div>
-                </div>
+                <div id="listings-list"></div>
             </div>
 
-            <!-- access requests -->
             <div id="tab-requests" class="tab-content">
-                <div id="requests-list">
-                    <div class="empty-state">
-                        <h3>no pending requests</h3>
-                        <p>when researchers request access to your data, they'll appear here.</p>
-                    </div>
-                </div>
+                <div id="requests-list"></div>
             </div>
 
-            <!-- active consents -->
-            <div id="tab-consents" class="tab-content">
-                <div id="consents-list">
-                    <div class="empty-state">
-                        <h3>no active consents</h3>
-                        <p>consents you've granted will appear here.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- new listing form -->
             <div id="tab-new" class="tab-content">
                 <div class="form-section">
                     <h2>create new listing</h2>
@@ -106,22 +77,20 @@
                         </div>
                         <div class="form-group">
                             <label for="listing-description">description</label>
-                            <textarea id="listing-description" rows="3" 
-                                placeholder="describe your data (e.g., 'complete blood panel from 2025, includes cholesterol, glucose, etc.')" 
+                            <textarea id="listing-description" rows="3"
+                                placeholder="describe your data (e.g., 'complete blood panel from 2025')"
                                 required></textarea>
                         </div>
                         <div class="form-group">
                             <label for="listing-price">base price (HEALTH tokens)</label>
-                            <input type="number" id="listing-price" min="1" step="1" 
-                                placeholder="100" required>
+                            <input type="number" id="listing-price" min="1" step="1" placeholder="100" required>
                             <small style="color: var(--text-muted); font-size: 0.8rem;">
                                 researchers can offer more. you keep 95%, platform takes 5%.
                             </small>
                         </div>
                         <div class="form-group">
                             <label for="listing-file">encrypted data file (IPFS hash or upload)</label>
-                            <input type="text" id="listing-file" 
-                                placeholder="ipfs://Qm... or paste your IPFS hash">
+                            <input type="text" id="listing-file" placeholder="ipfs://Qm... or paste your IPFS hash">
                         </div>
                         <div class="form-actions">
                             <button type="submit" id="create-listing-btn">create listing</button>
@@ -137,61 +106,167 @@
     </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.9.0/ethers.umd.min.js"></script>
+    <script src="js/api.js"></script>
     <script src="js/app.js"></script>
     <script>
-        // tab switching
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', () => {
                 document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
                 document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                
                 tab.classList.add('active');
                 document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
             });
         });
 
-        // called when wallet connects
-        function onWalletConnected() {
+        function renderEmpty(container, title, message) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <h3>${escapeHtml(title)}</h3>
+                    <p>${escapeHtml(message)}</p>
+                </div>
+            `;
+        }
+
+        function renderListingCard(listing) {
+            return `
+                <div class="data-card" style="margin-bottom: 1rem;">
+                    <div class="data-card-header">
+                        <div>
+                            <div class="data-card-title">${escapeHtml(listing.dataDescription)}</div>
+                            <div class="data-card-meta">
+                                <span class="badge badge-neutral">${escapeHtml(listing.categoryLabel)}</span>
+                                · ${listing.totalAccesses} accesses
+                            </div>
+                        </div>
+                        <div class="data-card-price">${escapeHtml(listing.basePriceFormatted)} HEALTH</div>
+                    </div>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">${escapeHtml(listing.encryptedDataURI)}</p>
+                </div>
+            `;
+        }
+
+        function renderRequestCard(request) {
+            const listing = request.listing || {};
+            const actions = request.status === 0 ? `
+                <div class="data-card-actions">
+                    <button class="btn-small btn-small-primary" onclick="handleApprove('${request.requestId}')">approve</button>
+                    <button class="btn-small btn-small-secondary" onclick="handleReject('${request.requestId}')">reject</button>
+                    <button class="btn-small btn-small-primary" onclick="handleComplete('${request.requestId}')">complete & pay</button>
+                </div>
+            ` : `<span class="badge badge-neutral">${escapeHtml(request.statusLabel)}</span>`;
+
+            return `
+                <div class="data-card" style="margin-bottom: 1rem;">
+                    <div class="data-card-header">
+                        <div>
+                            <div class="data-card-title">${escapeHtml(listing.dataDescription || 'Data request')}</div>
+                            <div class="data-card-meta">${escapeHtml(request.purpose)}</div>
+                        </div>
+                        <div class="data-card-price">${escapeHtml(request.offeredPriceFormatted)} HEALTH</div>
+                    </div>
+                    ${actions}
+                </div>
+            `;
+        }
+
+        async function onWalletConnected() {
             document.getElementById('not-connected').style.display = 'none';
             document.getElementById('dashboard').style.display = 'block';
-            loadPatientData();
+            await loadPatientData();
+        }
+
+        async function ensureRegistered() {
+            const profile = await fetchPatient(userAddress);
+            if (!profile.registered) {
+                await registerPatient(userAddress);
+                showToast('patient profile registered', 'success');
+            }
         }
 
         async function loadPatientData() {
-            // load patient's listings, requests, consents
-            // for now, show empty states
-            console.log('loading patient data for:', userAddress);
+            try {
+                await ensureRegistered();
+                const profile = await fetchPatient(userAddress);
+
+                document.getElementById('my-earnings').textContent =
+                    `${profile.totalEarningsFormatted || '0'} HEALTH`;
+                document.getElementById('my-listings').textContent =
+                    String(profile.listings?.length || 0);
+                document.getElementById('my-requests').textContent =
+                    String(profile.pendingRequests?.length || 0);
+
+                const listingsEl = document.getElementById('listings-list');
+                if (!profile.listings?.length) {
+                    renderEmpty(listingsEl, 'no listings yet', 'create your first data listing to start earning.');
+                } else {
+                    listingsEl.innerHTML = profile.listings.map(renderListingCard).join('');
+                }
+
+                const requestsEl = document.getElementById('requests-list');
+                if (!profile.pendingRequests?.length) {
+                    renderEmpty(requestsEl, 'no pending requests', 'when researchers request access, they appear here.');
+                } else {
+                    requestsEl.innerHTML = profile.pendingRequests.map(renderRequestCard).join('');
+                }
+            } catch (error) {
+                console.error(error);
+                showToast(error.message, 'error');
+            }
         }
 
-        // new listing form
+        async function handleApprove(requestId) {
+            try {
+                await approveAccess(requestId);
+                showToast('access approved', 'success');
+                await loadPatientData();
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+        }
+
+        async function handleReject(requestId) {
+            try {
+                await rejectAccess(requestId, 'Patient declined access');
+                showToast('request rejected', 'success');
+                await loadPatientData();
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+        }
+
+        async function handleComplete(requestId) {
+            try {
+                await completeAccess(requestId);
+                showToast('payment completed — earnings updated', 'success');
+                await loadPatientData();
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+        }
+
         document.getElementById('new-listing-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
             const btn = document.getElementById('create-listing-btn');
             const originalText = btn.textContent;
             btn.textContent = 'creating...';
             btn.disabled = true;
 
             try {
-                const category = document.getElementById('listing-category').value;
-                const description = document.getElementById('listing-description').value;
-                const price = document.getElementById('listing-price').value;
-                const fileUri = document.getElementById('listing-file').value;
+                await ensureRegistered();
+                await createListing({
+                    walletAddress: userAddress,
+                    category: document.getElementById('listing-category').value,
+                    description: document.getElementById('listing-description').value,
+                    price: document.getElementById('listing-price').value,
+                    fileUri: document.getElementById('listing-file').value,
+                });
 
-                // in real app, this would call the smart contract
-                console.log('creating listing:', { category, description, price, fileUri });
-                
-                // simulate delay
-                await new Promise(r => setTimeout(r, 1500));
-                
                 showToast('listing created successfully', 'success');
-                
-                // switch to listings tab
+                document.getElementById('new-listing-form').reset();
                 document.querySelector('[data-tab="listings"]').click();
-                
+                await loadPatientData();
             } catch (error) {
-                console.error('error creating listing:', error);
-                showToast('failed to create listing', 'error');
+                showToast(error.message, 'error');
             } finally {
                 btn.textContent = originalText;
                 btn.disabled = false;

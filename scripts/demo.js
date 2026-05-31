@@ -33,9 +33,16 @@ async function main() {
   const consentManager = await hre.ethers.getContractAt("ConsentManager", deployment.contracts.ConsentManager);
   const dataMarketplace = await hre.ethers.getContractAt("DataMarketplace", deployment.contracts.DataMarketplace);
 
-  // Generate unique IDs
-  const patientId = hre.ethers.keccak256(hre.ethers.toUtf8Bytes("patient-001-" + Date.now()));
-  const researcherId = hre.ethers.keccak256(hre.ethers.toUtf8Bytes("researcher-001-" + Date.now()));
+  let patientId = await patientRegistry.walletToPatientId(patient.address);
+  let researcherId = await researcherRegistry.walletToResearcherId(researcher.address);
+
+  if (patientId === hre.ethers.ZeroHash) {
+    patientId = hre.ethers.keccak256(hre.ethers.toUtf8Bytes("patient-001-" + Date.now()));
+  }
+  if (researcherId === hre.ethers.ZeroHash) {
+    researcherId = hre.ethers.keccak256(hre.ethers.toUtf8Bytes("researcher-001-" + Date.now()));
+  }
+
   const dataCategory = hre.ethers.keccak256(hre.ethers.toUtf8Bytes("GENOMICS"));
   const listingId = hre.ethers.keccak256(hre.ethers.toUtf8Bytes("listing-001-" + Date.now()));
   const requestId = hre.ethers.keccak256(hre.ethers.toUtf8Bytes("request-001-" + Date.now()));
@@ -44,16 +51,26 @@ async function main() {
   // STEP 1: Register Patient
   // ═══════════════════════════════════════════════════════════════
   console.log("1️⃣  Registering patient...");
-  await patientRegistry.registerPatient(
-    patientId,
-    patient.address,
-    "ipfs://QmPatientEncryptedMetadata123"
-  );
-  console.log("   ✓ Patient registered");
+  const existingPatient = await patientRegistry.walletToPatientId(patient.address);
+  if (existingPatient === hre.ethers.ZeroHash) {
+    await patientRegistry.registerPatient(
+      patientId,
+      patient.address,
+      "ipfs://QmPatientEncryptedMetadata123"
+    );
+    console.log("   ✓ Patient registered");
+    await patientRegistry.verifyPatient(patientId);
+    console.log("   ✓ Patient verified");
+  } else {
+    patientId = existingPatient;
+    console.log("   ✓ Patient already registered");
+  }
 
-  // Verify patient
-  await patientRegistry.verifyPatient(patientId);
-  console.log("   ✓ Patient verified");
+  const patientData = await patientRegistry.patients(patientId);
+  if (patientData.status !== 2n) {
+    await patientRegistry.verifyPatient(patientId);
+    console.log("   ✓ Patient verified");
+  }
 
   // Update data categories
   const CATEGORY_GENOMICS = 1n << 0n;
@@ -64,43 +81,60 @@ async function main() {
   // STEP 2: Register Researcher
   // ═══════════════════════════════════════════════════════════════
   console.log("2️⃣  Registering researcher...");
-  await researcherRegistry.registerResearcher(
-    researcherId,
-    researcher.address,
-    1, // ResearcherType.Institution
-    "Johns Hopkins University",
-    "ipfs://QmResearcherCredentials456"
-  );
-  console.log("   ✓ Researcher registered");
+  const existingResearcher = await researcherRegistry.walletToResearcherId(researcher.address);
+  if (existingResearcher === hre.ethers.ZeroHash) {
+    await researcherRegistry.registerResearcher(
+      researcherId,
+      researcher.address,
+      1,
+      "Johns Hopkins University",
+      "ipfs://QmResearcherCredentials456"
+    );
+    console.log("   ✓ Researcher registered");
+    await researcherRegistry.verifyResearcher(researcherId);
+    console.log("   ✓ Researcher verified");
+  } else {
+    researcherId = existingResearcher;
+    console.log("   ✓ Researcher already registered");
+  }
 
-  // Verify researcher
-  await researcherRegistry.verifyResearcher(researcherId);
-  console.log("   ✓ Researcher verified");
-
-  // Approve researcher for genomics category
-  await researcherRegistry.approveCategory(researcherId, dataCategory);
-  console.log("   ✓ Researcher approved for GENOMICS category\n");
+  const hasCategory = await researcherRegistry.hasCategoryAccess(researcherId, dataCategory);
+  if (!hasCategory) {
+    await researcherRegistry.approveCategory(researcherId, dataCategory);
+    console.log("   ✓ Researcher approved for GENOMICS category\n");
+  } else {
+    console.log("   ✓ Researcher already approved for GENOMICS category\n");
+  }
 
   // ═══════════════════════════════════════════════════════════════
   // STEP 3: Patient Grants Consent
   // ═══════════════════════════════════════════════════════════════
   console.log("3️⃣  Granting consent...");
   const oneYear = 365 * 24 * 60 * 60;
-  const dataPrice = hre.ethers.parseEther("100"); // 100 HEALTH tokens
+  const dataPrice = hre.ethers.parseEther("100");
 
-  await consentManager.grantConsent(
+  const consentValidBefore = await consentManager.isConsentValid(
     patientId,
     researcherId,
-    dataCategory,
-    oneYear,
-    "Cancer genomics research study",
-    true,  // allowDerivativeWorks
-    false, // allowCommercialUse
-    true,  // requireNotification
-    10,    // maxAccessCount
-    dataPrice
+    dataCategory
   );
-  console.log("   ✓ Consent granted for 1 year, max 10 accesses\n");
+  if (!consentValidBefore) {
+    await consentManager.grantConsent(
+      patientId,
+      researcherId,
+      dataCategory,
+      oneYear,
+      "Cancer genomics research study",
+      true,
+      false,
+      true,
+      10,
+      dataPrice
+    );
+    console.log("   ✓ Consent granted for 1 year, max 10 accesses\n");
+  } else {
+    console.log("   ✓ Consent already active\n");
+  }
 
   // ═══════════════════════════════════════════════════════════════
   // STEP 4: Create Data Listing
@@ -140,21 +174,25 @@ async function main() {
   console.log("   ✓ Access approved, decryption key provided\n");
 
   // ═══════════════════════════════════════════════════════════════
-  // STEP 7: Complete Payment (simulate)
+  // STEP 7: Complete Payment
   // ═══════════════════════════════════════════════════════════════
   console.log("7️⃣  Processing payment...");
-  
-  // First, transfer some tokens to the researcher and approve marketplace
-  const patientRewardsPool = deployment.treasury.patientRewardsPool;
-  const healthTokenWithAdmin = healthToken.connect(admin);
-  
-  // For demo: mint some tokens to admin and transfer to marketplace operator
-  // In production, researcher would purchase tokens first
-  console.log("   (Demo: Setting up token allowances...)");
-  
-  // Check balance
-  const balance = await healthToken.balanceOf(patientRewardsPool);
-  console.log(`   Patient rewards pool balance: ${hre.ethers.formatEther(balance)} HEALTH`);
+
+  const marketplaceAddr = await dataMarketplace.getAddress();
+  const adminBalance = await healthToken.balanceOf(admin.address);
+  if (adminBalance < dataPrice) {
+    await healthToken.mint(admin.address, dataPrice - adminBalance);
+  }
+  await healthToken.approve(marketplaceAddr, dataPrice);
+  await dataMarketplace.completeAccess(requestId);
+
+  const patientBalanceAfter = await healthToken.balanceOf(patient.address);
+  const platformBalanceAfter = await healthToken.balanceOf(deployment.treasury.operationsWallet);
+  const platformFee = (dataPrice * 500n) / 10000n;
+  const patientPayout = dataPrice - platformFee;
+
+  console.log(`   ✓ Payment complete: ${hre.ethers.formatEther(patientPayout)} HEALTH to patient`);
+  console.log(`   ✓ Platform fee: ${hre.ethers.formatEther(platformFee)} HEALTH`);
 
   // ═══════════════════════════════════════════════════════════════
   // STATS
@@ -163,10 +201,10 @@ async function main() {
   console.log("📊 DEMO RESULTS");
   console.log("=".repeat(60));
 
-  const patientData = await patientRegistry.patients(patientId);
+  const finalPatientData = await patientRegistry.patients(patientId);
   console.log("\n👤 Patient Status:");
-  console.log(`   Verified: ${patientData.status === 2n}`);
-  console.log(`   Total Data Sets: ${patientData.totalDataSets}`);
+  console.log(`   Verified: ${finalPatientData.status === 2n}`);
+  console.log(`   Total Data Sets: ${finalPatientData.totalDataSets}`);
 
   const researcherData = await researcherRegistry.researchers(researcherId);
   console.log("\n🔬 Researcher Status:");
@@ -188,6 +226,11 @@ async function main() {
   console.log(`   Total Listings: ${marketStats[0]}`);
   console.log(`   Total Transactions: ${marketStats[1]}`);
   console.log(`   Total Volume: ${hre.ethers.formatEther(marketStats[2])} HEALTH`);
+
+  const completedRequest = await dataMarketplace.accessRequests(requestId);
+  console.log("\n💰 Payment Status:");
+  console.log(`   Request Status: Completed (${completedRequest.status})`);
+  console.log(`   Patient HEALTH balance: ${hre.ethers.formatEther(patientBalanceAfter)}`);
 
   console.log("\n✅ Demo completed successfully!");
 }

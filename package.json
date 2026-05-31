@@ -6,8 +6,13 @@
   "scripts": {
     "compile": "hardhat compile",
     "test": "hardhat test",
+    "deploy:hardhat": "hardhat run scripts/deploy.js --network localhost",
     "deploy:local": "hardhat run scripts/deploy.js --network besu_local",
     "deploy:testnet": "hardhat run scripts/deploy.js --network besu_testnet",
+    "demo": "hardhat run scripts/demo.js --network localhost",
+    "seed": "hardhat run scripts/seed.js --network localhost",
+    "node:hardhat": "hardhat node",
+    "start:api": "node server/index.js",
     "node:start": "docker-compose -f docker/docker-compose.yml up -d",
     "node:stop": "docker-compose -f docker/docker-compose.yml down",
     "node:logs": "docker-compose -f docker/docker-compose.yml logs -f",
@@ -31,6 +36,8 @@
     "hardhat": "^2.19.4"
   },
   "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
     "ethers": "^6.9.2"
   }
 }

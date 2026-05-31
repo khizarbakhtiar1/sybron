@@ -88,6 +88,7 @@ contract DataMarketplace is AccessControl, Pausable, ReentrancyGuard {
     mapping(bytes32 => bytes32[]) public researcherRequests;   // researcherId => requestIds
 
     bytes32[] public allListings;
+    bytes32[] public allRequests;
     uint256 public totalListings;
     uint256 public totalTransactions;
     uint256 public totalVolume;
@@ -218,6 +219,7 @@ contract DataMarketplace is AccessControl, Pausable, ReentrancyGuard {
         });
 
         researcherRequests[researcherId].push(requestId);
+        allRequests.push(requestId);
 
         emit AccessRequested(requestId, researcherId, listingId, offeredPrice);
     }
@@ -356,6 +358,20 @@ contract DataMarketplace is AccessControl, Pausable, ReentrancyGuard {
      */
     function getResearcherRequests(bytes32 researcherId) external view returns (bytes32[] memory) {
         return researcherRequests[researcherId];
+    }
+
+    /**
+     * @dev Get all listing IDs
+     */
+    function getAllListings() external view returns (bytes32[] memory) {
+        return allListings;
+    }
+
+    /**
+     * @dev Get all access request IDs
+     */
+    function getAllRequests() external view returns (bytes32[] memory) {
+        return allRequests;
     }
 
     /**

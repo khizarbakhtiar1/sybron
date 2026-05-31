@@ -237,6 +237,15 @@ describe("DataMarketplace", function () {
       expect(listings.length).to.equal(1);
       expect(listings[0]).to.equal(listingId);
     });
+
+    it("Should return all listings", async function () {
+      await dataMarketplace.createListing(
+        listingId, patientId, dataCategory, "ipfs://data", "Desc", ethers.parseEther("100")
+      );
+      const allListings = await dataMarketplace.getAllListings();
+      expect(allListings.length).to.equal(1);
+      expect(allListings[0]).to.equal(listingId);
+    });
   });
 
   describe("Request Access", function () {
@@ -258,6 +267,10 @@ describe("DataMarketplace", function () {
       const request = await dataMarketplace.accessRequests(requestId);
       expect(request.researcherId).to.equal(researcherId);
       expect(request.status).to.equal(0); // Pending
+
+      const allRequests = await dataMarketplace.getAllRequests();
+      expect(allRequests.length).to.equal(1);
+      expect(allRequests[0]).to.equal(requestId);
     });
 
     it("Should reject duplicate request ID", async function () {
